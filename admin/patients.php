@@ -287,6 +287,7 @@ th {
                     <th>Age</th>
                     <th>Gender</th>
                     <th>Phone</th>
+                    <th>Action</th>
                 </tr>
 
                 <?php if (count($patients) > 0): ?>
@@ -298,6 +299,11 @@ th {
                             <td><?= htmlspecialchars((string)($patient["age"] ?? "")) ?></td>
                             <td><?= htmlspecialchars($patient["gender"] ?? "") ?></td>
                             <td><?= htmlspecialchars($patient["phone"] ?? "") ?></td>
+                            <td>
+    <a href="edit_patient.php?id=<?= $patient['patient_id'] ?>">
+        Edit
+    </a>
+</td>
                         </tr>
                     <?php endforeach; ?>
 
