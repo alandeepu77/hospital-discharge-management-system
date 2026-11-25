@@ -12,6 +12,41 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
 $message = "";
 $error = "";
 
+// Update admission status
+if (isset($_POST["update_status"])) {
+
+    $admission_id = $_POST["admission_id"] ?? "";
+    $new_status = $_POST["admission_status"] ?? "";
+
+    $allowed_statuses = [
+        "Admitted",
+        "Discharge Requested",
+        "Discharged"
+    ];
+
+    if (
+        $admission_id === "" ||
+        !in_array($new_status, $allowed_statuses, true)
+    ) {
+        $error = "Invalid admission status.";
+    } else {
+        $stmt = $conn->prepare(
+            "UPDATE admissions
+             SET admission_status = ?
+             WHERE admission_id = ?"
+        );
+
+        $stmt->execute([$new_status, $admission_id]);
+
+        if ($stmt->rowCount() > 0) {
+            $message = "Admission status updated successfully!";
+        } else {
+            $message = "No change was made to the admission status.";
+        }
+    }
+}
+
+
 // Add a new admission
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $patient_id = $_POST["patient_id"] ?? "";
@@ -226,7 +261,31 @@ $admissions = $conn->query(
                         <td><?= htmlspecialchars($admission['patient_name']) ?></td>
                         <td><?= htmlspecialchars($admission['admission_date']) ?></td>
                         <td><?= htmlspecialchars($admission['department']) ?></td>
-                        <td><?= htmlspecialchars($admission['admission_status']) ?></td>
+                        <td>
+    <form method="POST">
+        <input type="hidden" name="admission_id"
+               value="<?= $admission['admission_id'] ?>">
+
+        <select name="admission_status">
+            <option value="Admitted"
+                <?= $admission['admission_status'] === 'Admitted' ? 'selected' : '' ?>>
+                Admitted
+            </option>
+
+            <option value="Discharge Requested"
+                <?= $admission['admission_status'] === 'Discharge Requested' ? 'selected' : '' ?>>
+                Discharge Requested
+            </option>
+
+            <option value="Discharged"
+                <?= $admission['admission_status'] === 'Discharged' ? 'selected' : '' ?>>
+                Discharged
+            </option>
+        </select>
+
+        <button type="submit" name="update_status">Update</button>
+    </form>
+</td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
