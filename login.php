@@ -1,4 +1,5 @@
 
+
 <?php
 session_start();
 require_once "config/database.php";
@@ -11,8 +12,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = $_POST["password"] ?? "";
 
     if ($username === "" || $password === "") {
+
         $error = "Please enter your username and password.";
+
     } else {
+
         $stmt = $conn->prepare(
             "SELECT user_id, full_name, username, password, role
              FROM users
@@ -31,15 +35,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION["username"] = $user["username"];
             $_SESSION["role"] = $user["role"];
 
-            if ($user["role"] === "admin") {
+            $role = $user["role"];
+
+            if ($role === "admin") {
+
                 header("Location: admin/dashboard.php");
                 exit;
+
+            } elseif ($role === "doctor") {
+
+                header("Location: doctor/dashboard.php");
+                exit;
+
+            } else {
+
+                $error = "Your department dashboard is not ready yet.";
+
             }
 
-            $error = "Your department dashboard is not ready yet.";
-
         } else {
+
             $error = "Incorrect username or password.";
+
         }
     }
 }
@@ -47,9 +64,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Login | Hospital Discharge Management System</title>
 
     <style>
@@ -138,13 +157,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             text-decoration: none;
         }
     </style>
+
 </head>
 
 <body>
 
     <div class="login-box">
+
         <h2>Welcome Back</h2>
-        <p class="subtitle">Hospital Discharge Management System</p>
+
+        <p class="subtitle">
+            Hospital Discharge Management System
+        </p>
 
         <?php if ($error !== ""): ?>
             <p class="error">
@@ -153,22 +177,36 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <?php endif; ?>
 
         <form action="login.php" method="POST">
+
             <label for="username">Username</label>
-            <input type="text" id="username" name="username"
-                   placeholder="Enter your username" required>
+
+            <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Enter your username"
+                required
+            >
 
             <label for="password">Password</label>
-            <input type="password" id="password" name="password"
-                   placeholder="Enter your password" required>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+            >
 
             <button type="submit">Login</button>
+
         </form>
 
         <div class="back">
             <a href="index.php">← Back to Home</a>
         </div>
+
     </div>
 
 </body>
 </html>
-
